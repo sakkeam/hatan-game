@@ -3,9 +3,9 @@
 This repository is a Next.js 16 (App Router) app using React 19, TypeScript (strict), and Tailwind CSS v4. Keep changes minimal and aligned with these patterns.
 
 ## Run & Build
-- Dev server: `npm run dev` (port 3000)
-- Production build: `npm run build` then `npm run start`
-- Linting: `npm run lint` (ESLint flat config with `eslint-config-next`)
+- Dev server: `bun run dev` (port 3000)
+- Production build: `bun run build` then `bun run start`
+- Linting: `bun run lint` (ESLint flat config with `eslint-config-next`)
 
 ## Architecture & Layout
 - App Router structure under `app/`.
