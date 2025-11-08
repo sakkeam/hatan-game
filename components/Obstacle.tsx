@@ -2,7 +2,8 @@
 
 import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Mesh } from 'three';
+import { Text } from '@react-three/drei';
+import { Group } from 'three';
 import { Obstacle as ObstacleType } from '@/store/gameStore';
 
 interface ObstacleProps {
@@ -10,19 +11,26 @@ interface ObstacleProps {
 }
 
 export function Obstacle({ obstacle }: ObstacleProps) {
-  const meshRef = useRef<Mesh>(null);
+  const groupRef = useRef<Group>(null);
 
   useFrame(() => {
-    if (meshRef.current) {
-      meshRef.current.position.x = obstacle.position.x;
-      meshRef.current.position.y = obstacle.position.y;
+    if (groupRef.current) {
+      groupRef.current.position.x = obstacle.position.x;
+      groupRef.current.position.y = obstacle.position.y;
     }
   });
 
   return (
-    <mesh ref={meshRef}>
-      <boxGeometry args={[obstacle.width, obstacle.height, 0.5]} />
-      <meshStandardMaterial color="#4a5568" />
-    </mesh>
+    <group ref={groupRef}>
+      <Text
+        font="/fonts/Noto_Sans_JP/NotoSansJP-VariableFont_wght.ttf"
+        fontSize={1.2}
+        color="#4a5568"
+        anchorX="center"
+        anchorY="middle"
+      >
+        {obstacle.text}
+      </Text>
+    </group>
   );
 }
