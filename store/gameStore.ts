@@ -16,26 +16,19 @@ export interface Obstacle {
   height: number;
 }
 
-export interface Star {
-  id: string;
-  position: Position;
-  collected: boolean;
-}
-
 export interface Player {
   position: Position;
   velocity: number;
-  invincible: boolean;
-  invincibleTimeRemaining: number;
 }
 
 interface GameStore {
   gameState: GameState;
   player: Player;
   obstacles: Obstacle[];
-  stars: Star[];
-  score: number;
+  distance: number;
   scrollSpeed: number;
+  timeLimit: number;
+  timeRemaining: number;
   
   // Actions
   startGame: () => Result<void, string>;
@@ -44,20 +37,18 @@ interface GameStore {
   movePlayerDown: () => void;
   updatePlayerPosition: (deltaTime: number) => void;
   updateObstacles: (deltaTime: number) => void;
-  updateStars: (deltaTime: number) => void;
-  collectStar: (starId: string) => Result<void, string>;
+  updateDistance: (deltaTime: number) => void;
+  updateTimer: (deltaTime: number) => void;
   checkCollision: () => boolean;
   gameOver: () => void;
   gameClear: () => void;
-  updateInvincibility: (deltaTime: number) => void;
 }
 
 const PLAYER_MOVE_SPEED = 5;
 const INITIAL_SCROLL_SPEED = 3;
-const INVINCIBLE_DURATION = 5000; // 5 seconds
 const PLAYER_BOUNDS_TOP = 5;
 const PLAYER_BOUNDS_BOTTOM = -5;
-const GAME_DISTANCE = 100; // ゴールまでの距離
+const TIME_LIMIT = 30000; // 30 seconds in milliseconds
 
 export const useGameStore = create<GameStore>()(
   immer((set, get) => ({
@@ -65,27 +56,24 @@ export const useGameStore = create<GameStore>()(
     player: {
       position: { x: -8, y: 0 },
       velocity: 0,
-      invincible: false,
-      invincibleTimeRemaining: 0,
     },
     obstacles: [],
-    stars: [],
-    score: 0,
+    distance: 0,
     scrollSpeed: INITIAL_SCROLL_SPEED,
+    timeLimit: TIME_LIMIT,
+    timeRemaining: TIME_LIMIT,
 
     startGame: () => {
       try {
         set((state) => {
           state.gameState = 'playing';
-          state.score = 0;
+          state.distance = 0;
+          state.timeRemaining = TIME_LIMIT;
           state.player = {
             position: { x: -8, y: 0 },
             velocity: 0,
-            invincible: false,
-            invincibleTimeRemaining: 0,
           };
           state.obstacles = generateObstacles();
-          state.stars = generateStars();
           state.scrollSpeed = INITIAL_SCROLL_SPEED;
         });
         return ok(undefined);
@@ -97,15 +85,13 @@ export const useGameStore = create<GameStore>()(
     resetGame: () => {
       set((state) => {
         state.gameState = 'title';
-        state.score = 0;
+        state.distance = 0;
+        state.timeRemaining = TIME_LIMIT;
         state.player = {
           position: { x: -8, y: 0 },
           velocity: 0,
-          invincible: false,
-          invincibleTimeRemaining: 0,
         };
         state.obstacles = [];
-        state.stars = [];
         state.scrollSpeed = INITIAL_SCROLL_SPEED;
       });
     },
@@ -135,7 +121,7 @@ export const useGameStore = create<GameStore>()(
     },
 
     updateObstacles: (deltaTime: number) => {
-      const { scrollSpeed, score } = get();
+      const { scrollSpeed } = get();
       
       set((state) => {
         // Move obstacles
@@ -158,67 +144,25 @@ export const useGameStore = create<GameStore>()(
           const newObstacle = generateSingleObstacle(rightmostObstacle + 8);
           state.obstacles.push(newObstacle);
         }
-
-        // Check if player reached goal
-        if (score >= GAME_DISTANCE) {
-          get().gameClear();
-        }
       });
     },
 
-    updateStars: (deltaTime: number) => {
+    updateDistance: (deltaTime: number) => {
       const { scrollSpeed } = get();
       
       set((state) => {
-        // Move stars
-        state.stars.forEach((star) => {
-          if (!star.collected) {
-            star.position.x -= scrollSpeed * deltaTime;
-          }
-        });
-
-        // Remove off-screen stars
-        state.stars = state.stars.filter(
-          (star) => star.collected || star.position.x > -15
-        );
-
-        // Add new stars if needed
-        const activeStar = state.stars.find((s) => !s.collected && s.position.x > -15);
-        if (!activeStar && Math.random() < 0.02) {
-          const newStar = generateSingleStar(15);
-          state.stars.push(newStar);
-        }
+        state.distance += scrollSpeed * deltaTime * 10;
       });
     },
 
-    collectStar: (starId: string) => {
-      const star = get().stars.find((s) => s.id === starId);
-      if (!star) {
-        return err('Star not found');
-      }
-      if (star.collected) {
-        return err('Star already collected');
-      }
-
+    updateTimer: (deltaTime: number) => {
       set((state) => {
-        const targetStar = state.stars.find((s) => s.id === starId);
-        if (targetStar) {
-          targetStar.collected = true;
-          state.player.invincible = true;
-          state.player.invincibleTimeRemaining = INVINCIBLE_DURATION;
-          state.score += 10;
-        }
+        state.timeRemaining = Math.max(0, state.timeRemaining - deltaTime * 1000);
       });
-
-      return ok(undefined);
     },
 
     checkCollision: () => {
       const { player, obstacles } = get();
-      
-      if (player.invincible) {
-        return false;
-      }
 
       const playerBox = {
         minX: player.position.x - 0.5,
@@ -259,18 +203,6 @@ export const useGameStore = create<GameStore>()(
         state.gameState = 'clear';
       });
     },
-
-    updateInvincibility: (deltaTime: number) => {
-      set((state) => {
-        if (state.player.invincible) {
-          state.player.invincibleTimeRemaining -= deltaTime * 1000;
-          if (state.player.invincibleTimeRemaining <= 0) {
-            state.player.invincible = false;
-            state.player.invincibleTimeRemaining = 0;
-          }
-        }
-      });
-    },
   }))
 );
 
@@ -292,23 +224,5 @@ function generateSingleObstacle(xPosition: number): Obstacle {
     position: { x: xPosition, y: yPosition },
     width: 1,
     height,
-  };
-}
-
-function generateStars(): Star[] {
-  const stars: Star[] = [];
-  for (let i = 0; i < 3; i++) {
-    stars.push(generateSingleStar(10 + i * 20));
-  }
-  return stars;
-}
-
-function generateSingleStar(xPosition: number): Star {
-  const yPosition = (Math.random() - 0.5) * 6;
-  
-  return {
-    id: `star-${Date.now()}-${Math.random()}`,
-    position: { x: xPosition, y: yPosition },
-    collected: false,
   };
 }
