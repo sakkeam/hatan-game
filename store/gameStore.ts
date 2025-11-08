@@ -18,7 +18,10 @@ export interface Obstacle {
 
 export interface Player {
   position: Position;
+  currentLane: number; // 0-3 representing the four lanes
   velocity: number;
+  invincible: boolean;
+  invincibleTimeRemaining: number;
 }
 
 export interface Star {
@@ -53,18 +56,24 @@ interface GameStore {
   gameClear: () => void;
 }
 
-const PLAYER_MOVE_SPEED = 5;
+const LANES = [-4.5, -1.5, 1.5, 4.5]; // Y coordinates for 4 lanes
+const LANE_TRANSITION_SPEED = 0.2; // Interpolation speed for lane switching
 const INITIAL_SCROLL_SPEED = 3;
 const PLAYER_BOUNDS_TOP = 5;
 const PLAYER_BOUNDS_BOTTOM = -5;
 const TIME_LIMIT = 30000; // 30 seconds in milliseconds
+const INVINCIBLE_DURATION = 5000; // 5 seconds
+const GAME_DISTANCE = 100; // ゴールまでの距離
 
 export const useGameStore = create<GameStore>()(
   immer((set, get) => ({
     gameState: 'title',
     player: {
-      position: { x: -8, y: 0 },
+      position: { x: -8, y: LANES[2] },
+      currentLane: 2,
       velocity: 0,
+      invincible: false,
+      invincibleTimeRemaining: 0,
     },
     obstacles: [],
     stars: [],
@@ -80,8 +89,11 @@ export const useGameStore = create<GameStore>()(
           state.distance = 0;
           state.timeRemaining = TIME_LIMIT;
           state.player = {
-            position: { x: -8, y: 0 },
+            position: { x: -8, y: LANES[2] },
+            currentLane: 2,
             velocity: 0,
+            invincible: false,
+            invincibleTimeRemaining: 0,
           };
           state.obstacles = generateObstacles();
           state.stars = generateStars();
@@ -99,8 +111,11 @@ export const useGameStore = create<GameStore>()(
         state.distance = 0;
         state.timeRemaining = TIME_LIMIT;
         state.player = {
-          position: { x: -8, y: 0 },
+          position: { x: -8, y: LANES[2] },
+          currentLane: 2,
           velocity: 0,
+          invincible: false,
+          invincibleTimeRemaining: 0,
         };
         state.obstacles = [];
         state.stars = [];
@@ -110,25 +125,25 @@ export const useGameStore = create<GameStore>()(
 
     movePlayerUp: () => {
       set((state) => {
-        state.player.velocity = PLAYER_MOVE_SPEED;
+        if (state.player.currentLane < LANES.length - 1) {
+          state.player.currentLane++;
+        }
       });
     },
 
     movePlayerDown: () => {
       set((state) => {
-        state.player.velocity = -PLAYER_MOVE_SPEED;
+        if (state.player.currentLane > 0) {
+          state.player.currentLane--;
+        }
       });
     },
 
     updatePlayerPosition: (deltaTime: number) => {
       set((state) => {
-        const newY = state.player.position.y + state.player.velocity * deltaTime;
-        state.player.position.y = Math.max(
-          PLAYER_BOUNDS_BOTTOM,
-          Math.min(PLAYER_BOUNDS_TOP, newY)
-        );
-        // Apply friction
-        state.player.velocity *= 0.9;
+        const targetY = LANES[state.player.currentLane];
+        // Smooth interpolation to target lane
+        state.player.position.y += (targetY - state.player.position.y) * LANE_TRANSITION_SPEED;
       });
     },
 
@@ -206,24 +221,21 @@ export const useGameStore = create<GameStore>()(
       const playerBox = {
         minX: player.position.x - 0.5,
         maxX: player.position.x + 0.5,
-        minY: player.position.y - 0.5,
-        maxY: player.position.y + 0.5,
       };
 
       for (const obstacle of obstacles) {
         const obstacleBox = {
           minX: obstacle.position.x - obstacle.width / 2,
           maxX: obstacle.position.x + obstacle.width / 2,
-          minY: obstacle.position.y - obstacle.height / 2,
-          maxY: obstacle.position.y + obstacle.height / 2,
         };
 
-        if (
-          playerBox.maxX > obstacleBox.minX &&
-          playerBox.minX < obstacleBox.maxX &&
-          playerBox.maxY > obstacleBox.minY &&
-          playerBox.minY < obstacleBox.maxY
-        ) {
+        // Check X-axis collision
+        const xCollision = playerBox.maxX > obstacleBox.minX && playerBox.minX < obstacleBox.maxX;
+        
+        // Check if in same lane (within 1.0 unit tolerance)
+        const sameLane = Math.abs(player.position.y - obstacle.position.y) < 1.0;
+
+        if (xCollision && sameLane) {
           return true;
         }
       }
@@ -288,12 +300,12 @@ function generateObstacles(): Obstacle[] {
 }
 
 function generateSingleObstacle(xPosition: number): Obstacle {
+  const lane = Math.floor(Math.random() * LANES.length);
   const height = Math.random() * 2 + 1.5;
-  const yPosition = (Math.random() - 0.5) * 6;
   
   return {
     id: `obstacle-${Date.now()}-${Math.random()}`,
-    position: { x: xPosition, y: yPosition },
+    position: { x: xPosition, y: LANES[lane] },
     width: 1,
     height,
   };
@@ -308,11 +320,11 @@ function generateStars(): Star[] {
 }
 
 function generateSingleStar(xPosition: number): Star {
-  const yPosition = (Math.random() - 0.5) * 8;
+  const lane = Math.floor(Math.random() * LANES.length);
   
   return {
     id: `star-${Date.now()}-${Math.random()}`,
-    position: { x: xPosition, y: yPosition },
+    position: { x: xPosition, y: LANES[lane] },
     collected: false,
   };
 }
