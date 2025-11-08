@@ -10,9 +10,11 @@ export function useGameLoop() {
   const gameState = useGameStore((state) => state.gameState);
   const updatePlayerPosition = useGameStore((state) => state.updatePlayerPosition);
   const updateObstacles = useGameStore((state) => state.updateObstacles);
+  const updateStars = useGameStore((state) => state.updateStars);
   const updateDistance = useGameStore((state) => state.updateDistance);
   const updateTimer = useGameStore((state) => state.updateTimer);
   const checkCollision = useGameStore((state) => state.checkCollision);
+  const checkStarCollection = useGameStore((state) => state.checkStarCollection);
   const gameOver = useGameStore((state) => state.gameOver);
   const gameClear = useGameStore((state) => state.gameClear);
 
@@ -55,8 +57,12 @@ export function useGameLoop() {
     // Update game state
     updatePlayerPosition(delta);
     updateObstacles(delta);
+    updateStars(delta);
     updateDistance(delta);
     updateTimer(delta);
+
+    // Check for star collection
+    checkStarCollection();
 
     // Check if time is up
     const currentTimeRemaining = useGameStore.getState().timeRemaining;

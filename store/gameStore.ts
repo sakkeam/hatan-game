@@ -21,10 +21,17 @@ export interface Player {
   velocity: number;
 }
 
+export interface Star {
+  id: string;
+  position: Position;
+  collected: boolean;
+}
+
 interface GameStore {
   gameState: GameState;
   player: Player;
   obstacles: Obstacle[];
+  stars: Star[];
   distance: number;
   scrollSpeed: number;
   timeLimit: number;
@@ -37,9 +44,11 @@ interface GameStore {
   movePlayerDown: () => void;
   updatePlayerPosition: (deltaTime: number) => void;
   updateObstacles: (deltaTime: number) => void;
+  updateStars: (deltaTime: number) => void;
   updateDistance: (deltaTime: number) => void;
   updateTimer: (deltaTime: number) => void;
   checkCollision: () => boolean;
+  checkStarCollection: () => void;
   gameOver: () => void;
   gameClear: () => void;
 }
@@ -58,6 +67,7 @@ export const useGameStore = create<GameStore>()(
       velocity: 0,
     },
     obstacles: [],
+    stars: [],
     distance: 0,
     scrollSpeed: INITIAL_SCROLL_SPEED,
     timeLimit: TIME_LIMIT,
@@ -74,6 +84,7 @@ export const useGameStore = create<GameStore>()(
             velocity: 0,
           };
           state.obstacles = generateObstacles();
+          state.stars = generateStars();
           state.scrollSpeed = INITIAL_SCROLL_SPEED;
         });
         return ok(undefined);
@@ -92,6 +103,7 @@ export const useGameStore = create<GameStore>()(
           velocity: 0,
         };
         state.obstacles = [];
+        state.stars = [];
         state.scrollSpeed = INITIAL_SCROLL_SPEED;
       });
     },
@@ -147,6 +159,33 @@ export const useGameStore = create<GameStore>()(
       });
     },
 
+    updateStars: (deltaTime: number) => {
+      const { scrollSpeed } = get();
+      
+      set((state) => {
+        // Move stars
+        state.stars.forEach((star) => {
+          star.position.x -= scrollSpeed * deltaTime;
+        });
+
+        // Remove off-screen stars
+        state.stars = state.stars.filter(
+          (star) => star.position.x > -15
+        );
+
+        // Add new stars if needed
+        const rightmostStar = state.stars.reduce(
+          (max, star) => (star.position.x > max ? star.position.x : max),
+          0
+        );
+
+        if (rightmostStar < 15 && state.stars.length < 10) {
+          const newStar = generateSingleStar(rightmostStar + 12);
+          state.stars.push(newStar);
+        }
+      });
+    },
+
     updateDistance: (deltaTime: number) => {
       const { scrollSpeed } = get();
       
@@ -192,6 +231,39 @@ export const useGameStore = create<GameStore>()(
       return false;
     },
 
+    checkStarCollection: () => {
+      const { player } = get();
+
+      const playerBox = {
+        minX: player.position.x - 0.5,
+        maxX: player.position.x + 0.5,
+        minY: player.position.y - 0.5,
+        maxY: player.position.y + 0.5,
+      };
+
+      set((state) => {
+        state.stars.forEach((star) => {
+          if (!star.collected) {
+            const starBox = {
+              minX: star.position.x - 0.4,
+              maxX: star.position.x + 0.4,
+              minY: star.position.y - 0.4,
+              maxY: star.position.y + 0.4,
+            };
+
+            if (
+              playerBox.maxX > starBox.minX &&
+              playerBox.minX < starBox.maxX &&
+              playerBox.maxY > starBox.minY &&
+              playerBox.minY < starBox.maxY
+            ) {
+              star.collected = true;
+            }
+          }
+        });
+      });
+    },
+
     gameOver: () => {
       set((state) => {
         state.gameState = 'gameover';
@@ -224,5 +296,23 @@ function generateSingleObstacle(xPosition: number): Obstacle {
     position: { x: xPosition, y: yPosition },
     width: 1,
     height,
+  };
+}
+
+function generateStars(): Star[] {
+  const stars: Star[] = [];
+  for (let i = 0; i < 5; i++) {
+    stars.push(generateSingleStar(10 + i * 12));
+  }
+  return stars;
+}
+
+function generateSingleStar(xPosition: number): Star {
+  const yPosition = (Math.random() - 0.5) * 8;
+  
+  return {
+    id: `star-${Date.now()}-${Math.random()}`,
+    position: { x: xPosition, y: yPosition },
+    collected: false,
   };
 }
