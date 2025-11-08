@@ -20,9 +20,7 @@ export function Player() {
     <mesh ref={meshRef}>
       <sphereGeometry args={[0.5, 16, 16]} />
       <meshStandardMaterial 
-        color={player.invincible ? '#ffff00' : '#ff6b6b'} 
-        emissive={player.invincible ? '#ffaa00' : '#000000'}
-        emissiveIntensity={player.invincible ? 0.5 : 0}
+        color='#ff6b6b' 
       />
     </mesh>
   );
