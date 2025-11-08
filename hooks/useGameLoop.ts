@@ -15,7 +15,6 @@ export function useGameLoop() {
   const checkCollision = useGameStore((state) => state.checkCollision);
   const gameOver = useGameStore((state) => state.gameOver);
   const gameClear = useGameStore((state) => state.gameClear);
-  const timeRemaining = useGameStore((state) => state.timeRemaining);
 
   const destroySubject = useRef(new Subject<void>());
 
@@ -60,7 +59,8 @@ export function useGameLoop() {
     updateTimer(delta);
 
     // Check if time is up
-    if (timeRemaining <= 0) {
+    const currentTimeRemaining = useGameStore.getState().timeRemaining;
+    if (currentTimeRemaining <= 0) {
       gameClear();
     }
   });
