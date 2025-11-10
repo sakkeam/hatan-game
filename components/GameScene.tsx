@@ -1,7 +1,7 @@
 'use client';
 
+import { useState } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls } from '@react-three/drei';
 import Image from 'next/image';
 import { Player } from './Player';
 import { Obstacle } from './Obstacle';
@@ -9,6 +9,7 @@ import { StarItem } from './StarItem';
 import { useGameStore } from '@/store/gameStore';
 import { useGameInput } from '@/hooks/useGameInput';
 import { useGameLoop } from '@/hooks/useGameLoop';
+import { WebGLFallback } from './WebGLFallback';
 
 const LANES = [-4.8, -2.4, 0, 2.4, 4.8]; // Y coordinates for 5 lanes (matching background sections)
 
@@ -36,9 +37,14 @@ function Scene() {
 
 export function GameScene() {
   const gameState = useGameStore((state) => state.gameState);
+  const [webglError, setWebglError] = useState(false);
 
   if (gameState === 'title') {
     return null;
+  }
+
+  if (webglError) {
+    return <WebGLFallback />;
   }
 
   return (
@@ -55,6 +61,19 @@ export function GameScene() {
       <Canvas
         className="absolute inset-0"
         camera={{ position: [0, 0, 15], fov: 50 }}
+        style={{ background: '#1a202c' }}
+        dpr={[1, 2]}
+        shadows={false}
+        gl={{ antialias: false, powerPreference: 'high-performance' }}
+        onCreated={({ gl }) => {
+          // Log device type for debugging
+          const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+          console.log('WebGL initialized:', { isMobile, renderer: gl.capabilities.maxTextureSize });
+        }}
+        onError={(error) => {
+          console.error('WebGL error:', error);
+          setWebglError(true);
+        }}
       >
         <Scene />
       </Canvas>
