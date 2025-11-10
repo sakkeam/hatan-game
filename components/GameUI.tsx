@@ -12,7 +12,7 @@ export function GameUI() {
     return null;
   }
 
-  const distanceToGoal = Math.max(0, Math.floor(100 - distance));
+  const distanceToGoal = Math.max(0, Math.floor(1000 - distance));
   const seconds = Math.ceil(timeRemaining / 1000);
   const invincibleSeconds = (player.invincibleTimeRemaining / 1000).toFixed(1);
 
