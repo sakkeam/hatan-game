@@ -57,6 +57,7 @@ interface GameStore {
   checkStarCollection: () => void;
   gameOver: () => void;
   gameClear: () => void;
+  updateObstacleDimensions: (id: string, width: number, height: number) => void;
 }
 
 const LANES = [-4.8, -2.4, 0, 2.4, 4.8]; // Y coordinates for 5 lanes (matching background sections)
@@ -228,21 +229,23 @@ export const useGameStore = create<GameStore>()(
       const playerBox = {
         minX: player.position.x - 0.5,
         maxX: player.position.x + 0.5,
+        minY: player.position.y - 0.5,
+        maxY: player.position.y + 0.5,
       };
 
       for (const obstacle of obstacles) {
         const obstacleBox = {
           minX: obstacle.position.x - obstacle.width / 2,
           maxX: obstacle.position.x + obstacle.width / 2,
+          minY: obstacle.position.y - obstacle.height / 2,
+          maxY: obstacle.position.y + obstacle.height / 2,
         };
 
-        // Check X-axis collision
+        // Check 2D AABB collision
         const xCollision = playerBox.maxX > obstacleBox.minX && playerBox.minX < obstacleBox.maxX;
-        
-        // Check if in same lane (within 1.0 unit tolerance)
-        const sameLane = Math.abs(player.position.y - obstacle.position.y) < 1.0;
+        const yCollision = playerBox.maxY > obstacleBox.minY && playerBox.minY < obstacleBox.maxY;
 
-        if (xCollision && sameLane) {
+        if (xCollision && yCollision) {
           return true;
         }
       }
@@ -294,6 +297,16 @@ export const useGameStore = create<GameStore>()(
         state.gameState = 'clear';
       });
     },
+
+    updateObstacleDimensions: (id: string, width: number, height: number) => {
+      set((state) => {
+        const obstacle = state.obstacles.find((obs) => obs.id === id);
+        if (obstacle) {
+          obstacle.width = width;
+          obstacle.height = height;
+        }
+      });
+    },
   }))
 );
 
@@ -308,7 +321,6 @@ function generateObstacles(): Obstacle[] {
 
 function generateSingleObstacle(xPosition: number): Obstacle {
   const lane = Math.floor(Math.random() * LANES.length);
-  const height = Math.random() * 2 + 1.5;
   
   // Randomly select one of four hatan patterns
   const patterns: Array<{ type: ObstacleType; text: string }> = [
@@ -322,8 +334,8 @@ function generateSingleObstacle(xPosition: number): Obstacle {
   return {
     id: `obstacle-${Date.now()}-${Math.random()}`,
     position: { x: xPosition, y: LANES[lane] },
-    width: 1,
-    height,
+    width: 0.8,
+    height: 1.0,
     type: pattern.type,
     text: pattern.text,
   };
