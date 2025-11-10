@@ -2,6 +2,7 @@
 
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
+import Image from 'next/image';
 import { Player } from './Player';
 import { Obstacle } from './Obstacle';
 import { StarItem } from './StarItem';
@@ -53,10 +54,20 @@ export function GameScene() {
   }
 
   return (
-    <div className="w-full h-screen">
+    <div className="relative w-full h-screen">
+      {/* Background Image */}
+      <Image
+        src="/assets/images/haikei.png"
+        alt="Game Background"
+        fill
+        className="object-cover"
+        style={{ objectPosition: '0 -20%', zIndex: -1 }}
+        priority
+      />
+      {/* Game Canvas */}
       <Canvas
+        className="absolute inset-0"
         camera={{ position: [0, 0, 15], fov: 50 }}
-        style={{ background: '#1a202c' }}
       >
         <Scene />
       </Canvas>
