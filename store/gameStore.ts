@@ -191,8 +191,10 @@ export const useGameStore = create<GameStore>()(
         );
 
         if (rightmostObstacle < 15 && state.obstacles.length < 20) {
-          const newObstacle = generateSingleObstacle(rightmostObstacle + 8);
-          state.obstacles.push(newObstacle);
+          const newObstacle = generateSingleObstacle(rightmostObstacle + 8, state.obstacles);
+          if (newObstacle !== null) {
+            state.obstacles.push(newObstacle);
+          }
         }
       });
     },
@@ -411,12 +413,64 @@ export const useGameStore = create<GameStore>()(
 function generateObstacles(): Obstacle[] {
   const obstacles: Obstacle[] = [];
   for (let i = 0; i < 10; i++) {
-    obstacles.push(generateSingleObstacle(5 + i * 8));
+    const newObstacle = generateSingleObstacle(5 + i * 8, obstacles);
+    if (newObstacle !== null) {
+      obstacles.push(newObstacle);
+    }
   }
   return obstacles;
 }
 
-function generateSingleObstacle(xPosition: number): Obstacle {
+function generateSingleObstacle(xPosition: number, existingObstacles: Obstacle[] = []): Obstacle | null {
+  // Find obstacles at the same X position (within ±0.5 units)
+  const obstaclesAtSameX = existingObstacles.filter(
+    (obs) => Math.abs(obs.position.x - xPosition) < 0.5
+  );
+  
+  // Get occupied lane indices
+  const occupiedLanes = new Set(
+    obstaclesAtSameX.map((obs) => {
+      // Find which lane this obstacle is in
+      return LANES.findIndex((laneY) => Math.abs(laneY - obs.position.y) < 0.1);
+    })
+  );
+  
+  // If 3 or more lanes are occupied at this X position, find available lanes
+  if (occupiedLanes.size >= 3) {
+    const availableLanes = Array.from(
+      { length: LANES.length },
+      (_, i) => i
+    ).filter((i) => !occupiedLanes.has(i));
+    
+    // If no lanes available, skip generation
+    if (availableLanes.length === 0) {
+      return null;
+    }
+    
+    // Pick random available lane
+    const lane = availableLanes[Math.floor(Math.random() * availableLanes.length)];
+    const height = Math.random() * 2 + 1.5;
+    
+    // Randomly select one of four hatan patterns
+    const patterns: Array<{ type: ObstacleType; text: string }> = [
+      { type: 'hiragana', text: 'はたーん' },
+      { type: 'katakana', text: 'ハターン' },
+      { type: 'kanji', text: '破綻' },
+      { type: 'romaji', text: 'hatan' },
+    ];
+    const pattern = patterns[Math.floor(Math.random() * patterns.length)];
+    
+    return {
+      id: `obstacle-${Date.now()}-${Math.random()}`,
+      position: { x: xPosition, y: LANES[lane] },
+      width: 1,
+      height,
+      type: pattern.type,
+      text: pattern.text,
+    };
+  }
+  
+  // Less than 3 obstacles at this position, proceed normally
   const lane = Math.floor(Math.random() * LANES.length);
   
   // Randomly select one of four hatan patterns
