@@ -2,7 +2,8 @@
 
 import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Mesh } from 'three';
+import { useTexture } from '@react-three/drei';
+import { Sprite } from 'three';
 import { Star as StarType } from '@/store/gameStore';
 
 interface StarItemProps {
@@ -10,14 +11,15 @@ interface StarItemProps {
 }
 
 export function StarItem({ star }: StarItemProps) {
-  const meshRef = useRef<Mesh>(null);
+  const spriteRef = useRef<Sprite>(null);
+  const texture = useTexture('/assets/images/star.png');
 
   useFrame((state) => {
-    if (meshRef.current && !star.collected) {
-      meshRef.current.position.x = star.position.x;
-      meshRef.current.position.y = star.position.y;
+    if (spriteRef.current && !star.collected) {
+      spriteRef.current.position.x = star.position.x;
+      spriteRef.current.position.y = star.position.y;
       // Rotate for visual effect
-      meshRef.current.rotation.z = state.clock.elapsedTime * 2;
+      spriteRef.current.material.rotation = state.clock.elapsedTime * 2;
     }
   });
 
@@ -26,13 +28,8 @@ export function StarItem({ star }: StarItemProps) {
   }
 
   return (
-    <mesh ref={meshRef}>
-      <octahedronGeometry args={[0.4, 0]} />
-      <meshStandardMaterial 
-        color="#ffd700" 
-        emissive="#ffaa00"
-        emissiveIntensity={0.5}
-      />
-    </mesh>
+    <sprite ref={spriteRef} scale={[1.5, 1.5, 1]}>
+      <spriteMaterial map={texture} transparent={true} />
+    </sprite>
   );
 }
