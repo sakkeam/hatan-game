@@ -30,13 +30,6 @@ function Scene() {
       {stars.map((star) => (
         <StarItem key={star.id} star={star} />
       ))}
-      {/* Lane guidelines */}
-      {LANES.map((laneY, index) => (
-        <mesh key={`lane-${index}`} position={[0, laneY, -1]} rotation={[0, 0, 0]}>
-          <boxGeometry args={[50, 0.05, 0.1]} />
-          <meshStandardMaterial color="#4a5568" opacity={0.3} transparent />
-        </mesh>
-      ))}
       {/* Ground reference */}
       <mesh position={[0, -6, -2]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[50, 20]} />
