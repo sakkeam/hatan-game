@@ -1,10 +1,10 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, useCallback } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import { Group } from 'three';
-import { Obstacle as ObstacleType } from '@/store/gameStore';
+import { Obstacle as ObstacleType, useGameStore } from '@/store/gameStore';
 
 interface ObstacleProps {
   obstacle: ObstacleType;
@@ -12,6 +12,7 @@ interface ObstacleProps {
 
 export function Obstacle({ obstacle }: ObstacleProps) {
   const groupRef = useRef<Group>(null);
+  const updateObstacleDimensions = useGameStore((state) => state.updateObstacleDimensions);
 
   useFrame(() => {
     if (groupRef.current) {
@@ -19,6 +20,15 @@ export function Obstacle({ obstacle }: ObstacleProps) {
       groupRef.current.position.y = obstacle.position.y;
     }
   });
+
+  const handleSync = useCallback((troika: any) => {
+    if (troika.geometry?.boundingBox) {
+      const bounds = troika.geometry.boundingBox;
+      const width = bounds.max.x - bounds.min.x;
+      const height = bounds.max.y - bounds.min.y;
+      updateObstacleDimensions(obstacle.id, width, height);
+    }
+  }, [obstacle.id, updateObstacleDimensions]);
 
   return (
     <group ref={groupRef}>
@@ -28,6 +38,7 @@ export function Obstacle({ obstacle }: ObstacleProps) {
         color="#4a5568"
         anchorX="center"
         anchorY="middle"
+        onSync={handleSync}
       >
         {obstacle.text}
       </Text>
