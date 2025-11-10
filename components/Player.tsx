@@ -46,7 +46,7 @@ export function Player() {
 
   return (
     <mesh ref={meshRef}>
-      <planeGeometry args={[1, 1]} />
+      <planeGeometry args={[2, 2]} />
       <meshBasicMaterial map={textures[currentFrame]} transparent={true} />
     </mesh>
   );
