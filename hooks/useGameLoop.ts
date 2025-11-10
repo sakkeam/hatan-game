@@ -13,6 +13,8 @@ export function useGameLoop() {
   const updateStars = useGameStore((state) => state.updateStars);
   const updateGoal = useGameStore((state) => state.updateGoal);
   const updateDistance = useGameStore((state) => state.updateDistance);
+  const updateTimer = useGameStore((state) => state.updateTimer);
+  const updateInvincibility = useGameStore((state) => state.updateInvincibility);
   const checkCollision = useGameStore((state) => state.checkCollision);
   const checkStarCollection = useGameStore((state) => state.checkStarCollection);
   const checkGoalReached = useGameStore((state) => state.checkGoalReached);
@@ -60,6 +62,8 @@ export function useGameLoop() {
     updateStars(delta);
     updateGoal(delta);
     updateDistance(delta);
+    updateTimer(delta);
+    updateInvincibility(delta);
 
     // Check for star collection
     checkStarCollection();
