@@ -22,7 +22,7 @@ export interface Obstacle {
 
 export interface Player {
   position: Position;
-  currentLane: number; // 0-3 representing the four lanes
+  currentLane: number; // 0-4 representing the five lanes
   invincible: boolean;
   invincibleTimeRemaining: number;
 }
@@ -59,7 +59,7 @@ interface GameStore {
   gameClear: () => void;
 }
 
-const LANES = [-4.5, -1.5, 1.5, 4.5]; // Y coordinates for 4 lanes
+const LANES = [-4.8, -2.4, 0, 2.4, 4.8]; // Y coordinates for 5 lanes (matching background sections)
 const LANE_TRANSITION_SPEED = 0.2; // Interpolation speed for lane switching
 const INITIAL_SCROLL_SPEED = 3;
 const TIME_LIMIT = 30000; // 30 seconds in milliseconds
