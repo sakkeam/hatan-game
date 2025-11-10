@@ -28,7 +28,7 @@ export function StarItem({ star }: StarItemProps) {
   }
 
   return (
-    <sprite ref={spriteRef} scale={[0.8, 0.8, 1]}>
+    <sprite ref={spriteRef} scale={[1.5, 1.5, 1]}>
       <spriteMaterial map={texture} transparent={true} />
     </sprite>
   );
