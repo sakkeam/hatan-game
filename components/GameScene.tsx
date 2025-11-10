@@ -36,18 +36,6 @@ function Scene() {
       {goal && !goal.reached && (
         <Goal goal={goal} />
       )}
-      {/* Lane guidelines */}
-      {LANES.map((laneY, index) => (
-        <mesh key={`lane-${index}`} position={[0, laneY, -1]} rotation={[0, 0, 0]}>
-          <boxGeometry args={[50, 0.05, 0.1]} />
-          <meshStandardMaterial color="#4a5568" opacity={0.3} transparent />
-        </mesh>
-      ))}
-      {/* Ground reference */}
-      <mesh position={[0, -6, -2]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[50, 20]} />
-        <meshStandardMaterial color="#2d3748" opacity={0.3} transparent />
-      </mesh>
     </>
   );
 }
@@ -71,17 +59,17 @@ export function GameScene() {
         src="/assets/images/haikei.png"
         alt="Game Background"
         fill
-        style={{ objectFit: 'fill', zIndex: -1 }}
+        style={{ objectFit: 'cover' }}
         priority
       />
       {/* Game Canvas */}
       <Canvas
         className="absolute inset-0"
         camera={{ position: [0, 0, 15], fov: 50 }}
-        style={{ background: '#1a202c' }}
+        style={{ background: 'transparent' }}
         dpr={[1, 2]}
         shadows={false}
-        gl={{ antialias: false, powerPreference: 'high-performance' }}
+        gl={{ antialias: false, powerPreference: 'high-performance', alpha: true }}
         onCreated={({ gl }) => {
           // Log device type for debugging
           const isMobile = /Mobi|Android/i.test(navigator.userAgent);
