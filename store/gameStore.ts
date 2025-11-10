@@ -131,7 +131,7 @@ export const useGameStore = create<GameStore>()(
 
     movePlayerUp: () => {
       set((state) => {
-        if (state.player.currentLane < LANES.length - 1) {
+        if (state.player.currentLane < LANES.length - 2) { // Prevent moving to topmost lane
           state.player.currentLane++;
         }
       });
