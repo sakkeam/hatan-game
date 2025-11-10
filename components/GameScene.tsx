@@ -10,7 +10,7 @@ import { useGameStore } from '@/store/gameStore';
 import { useGameInput } from '@/hooks/useGameInput';
 import { useGameLoop } from '@/hooks/useGameLoop';
 
-const LANES = [-4.5, -1.5, 1.5, 4.5]; // Y coordinates for 4 lanes
+const LANES = [-4.8, -2.4, 0, 2.4, 4.8]; // Y coordinates for 5 lanes (matching background sections)
 
 function Scene() {
   const obstacles = useGameStore((state) => state.obstacles);
