@@ -30,11 +30,6 @@ function Scene() {
       {stars.map((star) => (
         <StarItem key={star.id} star={star} />
       ))}
-      {/* Ground reference */}
-      <mesh position={[0, -6, -2]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[50, 20]} />
-        <meshStandardMaterial color="#2d3748" opacity={0.3} transparent />
-      </mesh>
     </>
   );
 }
