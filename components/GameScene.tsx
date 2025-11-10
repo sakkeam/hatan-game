@@ -60,7 +60,7 @@ export function GameScene() {
         src="/assets/images/haikei.png"
         alt="Game Background"
         fill
-        style={{ objectFit: 'fill', objectPosition: '0 -20%', zIndex: -1 }}
+        style={{ objectFit: 'fill', zIndex: -1 }}
         priority
       />
       {/* Game Canvas */}
