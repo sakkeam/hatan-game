@@ -78,7 +78,7 @@ const LANES = [-4.8, -2.4, 0, 2.4, 4.8]; // Y coordinates for 5 lanes (matching 
 const LANE_TRANSITION_SPEED = 0.2; // Interpolation speed for lane switching
 const INITIAL_SCROLL_SPEED = 3;
 const GAME_DISTANCE = 100; // ゴールまでの距離
-const GOAL_SPAWN_DISTANCE = 120; // ゴールが出現する距離
+const GOAL_SPAWN_DISTANCE = 1000; // ゴールが出現する距離
 
 // Speed multipliers for each obstacle type
 const SPEED_MULTIPLIERS: Record<ObstacleType, number> = {
