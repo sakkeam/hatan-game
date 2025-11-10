@@ -2,21 +2,20 @@
 
 import { useRef, useEffect, useState } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
-import { Mesh, TextureLoader, Texture } from 'three';
 import * as THREE from 'three';
 import { useGameStore } from '@/store/gameStore';
 
 export function Player() {
-  const meshRef = useRef<Mesh>(null);
+  const meshRef = useRef<THREE.Mesh>(null);
   const player = useGameStore((state) => state.player);
-  const [textures, setTextures] = useState<Texture[] | null>(null);
+  const [textures, setTextures] = useState<THREE.Texture[] | null>(null);
   const [currentFrame, setCurrentFrame] = useState(0);
   const frameTimer = useRef(0);
   const rainbowHueRef = useRef(0);
   const { camera } = useThree();
 
   useEffect(() => {
-    const loader = new TextureLoader();
+    const loader = new THREE.TextureLoader();
     const texturePromises = [
       loader.loadAsync('/assets/images/run1.png'),
       loader.loadAsync('/assets/images/run2.png'),
