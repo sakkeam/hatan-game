@@ -33,9 +33,9 @@ export function Player() {
       meshRef.current.position.y = player.position.y;
       meshRef.current.lookAt(camera.position);
 
-      // 5fps animation (0.2 seconds per frame)
+      // 10fps animation (0.1 seconds per frame)
       frameTimer.current += delta;
-      if (frameTimer.current >= 0.2) {
+      if (frameTimer.current >= 0.1) {
         frameTimer.current = 0;
         setCurrentFrame((prev) => (prev + 1) % 4);
       }
