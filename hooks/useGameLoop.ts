@@ -11,12 +11,12 @@ export function useGameLoop() {
   const updatePlayerPosition = useGameStore((state) => state.updatePlayerPosition);
   const updateObstacles = useGameStore((state) => state.updateObstacles);
   const updateStars = useGameStore((state) => state.updateStars);
+  const updateDistance = useGameStore((state) => state.updateDistance);
+  const updateTimer = useGameStore((state) => state.updateTimer);
   const checkCollision = useGameStore((state) => state.checkCollision);
-  const collectStar = useGameStore((state) => state.collectStar);
+  const checkStarCollection = useGameStore((state) => state.checkStarCollection);
   const gameOver = useGameStore((state) => state.gameOver);
-  const updateInvincibility = useGameStore((state) => state.updateInvincibility);
-  const player = useGameStore((state) => state.player);
-  const stars = useGameStore((state) => state.stars);
+  const gameClear = useGameStore((state) => state.gameClear);
 
   const destroySubject = useRef(new Subject<void>());
 
@@ -58,20 +58,16 @@ export function useGameLoop() {
     updatePlayerPosition(delta);
     updateObstacles(delta);
     updateStars(delta);
-    updateInvincibility(delta);
+    updateDistance(delta);
+    updateTimer(delta);
 
-    // Check star collection
-    stars.forEach((star) => {
-      if (star.collected) return;
+    // Check for star collection
+    checkStarCollection();
 
-      const distance = Math.sqrt(
-        Math.pow(player.position.x - star.position.x, 2) +
-        Math.pow(player.position.y - star.position.y, 2)
-      );
-
-      if (distance < 1) {
-        collectStar(star.id);
-      }
-    });
+    // Check if time is up
+    const currentTimeRemaining = useGameStore.getState().timeRemaining;
+    if (currentTimeRemaining <= 0) {
+      gameClear();
+    }
   });
 }
