@@ -71,17 +71,17 @@ export function GameScene() {
         src="/assets/images/haikei.png"
         alt="Game Background"
         fill
-        style={{ objectFit: 'fill', zIndex: -1 }}
+        style={{ objectFit: 'cover' }}
         priority
       />
       {/* Game Canvas */}
       <Canvas
         className="absolute inset-0"
         camera={{ position: [0, 0, 15], fov: 50 }}
-        style={{ background: '#1a202c' }}
+        style={{ background: 'transparent' }}
         dpr={[1, 2]}
         shadows={false}
-        gl={{ antialias: false, powerPreference: 'high-performance' }}
+        gl={{ antialias: false, powerPreference: 'high-performance', alpha: true }}
         onCreated={({ gl }) => {
           // Log device type for debugging
           const isMobile = /Mobi|Android/i.test(navigator.userAgent);
