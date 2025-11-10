@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "ハタンゲーム",
-  description: "ハタン回避3Dアクションゲーム",
+  title: "はたんゲーム",
+  description: "寝坊したキミは食パンをかじりながら走り出す。「はたーん」をよけながらゴールを目指す横スクロールアクションゲーム",
 };
 
 export default function RootLayout({
