@@ -19,8 +19,22 @@
   }
 }
 
+@font-face {
+  font-family: 'Noto Sans JP';
+  src: url('/fonts/Noto_Sans_JP/NotoSansJP-VariableFont_wght.ttf') format('truetype');
+  font-display: swap;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  touch-action: none;
+  overscroll-behavior: none;
+}
+
+body.playing {
+  position: fixed;
+  width: 100%;
+  overflow: hidden;
 }

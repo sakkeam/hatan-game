@@ -8,6 +8,18 @@ export function useGameInput() {
   const movePlayerDown = useGameStore((state) => state.movePlayerDown);
   const gameState = useGameStore((state) => state.gameState);
 
+  // Control body class for scroll prevention during gameplay
+  useEffect(() => {
+    if (gameState === 'playing') {
+      document.body.classList.add('playing');
+    } else {
+      document.body.classList.remove('playing');
+    }
+    return () => {
+      document.body.classList.remove('playing');
+    };
+  }, [gameState]);
+
   useEffect(() => {
     if (gameState !== 'playing') {
       return;
