@@ -307,7 +307,7 @@ export const useGameStore = create<GameStore>()(
         }
       });
     },
-  })
+  }))
 );
 
 // Helper functions
