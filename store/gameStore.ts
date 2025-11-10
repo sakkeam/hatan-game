@@ -33,15 +33,22 @@ export interface Star {
   collected: boolean;
 }
 
+export interface Goal {
+  id: string;
+  position: Position;
+  width: number;
+  height: number;
+  reached: boolean;
+}
+
 interface GameStore {
   gameState: GameState;
   player: Player;
   obstacles: Obstacle[];
   stars: Star[];
+  goal: Goal | null;
   distance: number;
   scrollSpeed: number;
-  timeLimit: number;
-  timeRemaining: number;
   
   // Actions
   startGame: () => Result<void, string>;
@@ -51,10 +58,11 @@ interface GameStore {
   updatePlayerPosition: (deltaTime: number) => void;
   updateObstacles: (deltaTime: number) => void;
   updateStars: (deltaTime: number) => void;
+  updateGoal: (deltaTime: number) => void;
   updateDistance: (deltaTime: number) => void;
-  updateTimer: (deltaTime: number) => void;
   checkCollision: () => boolean;
   checkStarCollection: () => void;
+  checkGoalReached: () => boolean;
   gameOver: () => void;
   gameClear: () => void;
   updateObstacleDimensions: (id: string, width: number, height: number) => void;
@@ -63,9 +71,8 @@ interface GameStore {
 const LANES = [-4.8, -2.4, 0, 2.4, 4.8]; // Y coordinates for 5 lanes (matching background sections)
 const LANE_TRANSITION_SPEED = 0.2; // Interpolation speed for lane switching
 const INITIAL_SCROLL_SPEED = 3;
-const TIME_LIMIT = 30000; // 30 seconds in milliseconds
-const INVINCIBLE_DURATION = 5000; // 5 seconds
 const GAME_DISTANCE = 100; // ゴールまでの距離
+const GOAL_SPAWN_DISTANCE = 80; // ゴールが出現する距離
 
 // Speed multipliers for each obstacle type
 const SPEED_MULTIPLIERS: Record<ObstacleType, number> = {
@@ -86,17 +93,16 @@ export const useGameStore = create<GameStore>()(
     },
     obstacles: [],
     stars: [],
+    goal: null,
     distance: 0,
     scrollSpeed: INITIAL_SCROLL_SPEED,
-    timeLimit: TIME_LIMIT,
-    timeRemaining: TIME_LIMIT,
 
     startGame: () => {
       try {
         set((state) => {
           state.gameState = 'playing';
           state.distance = 0;
-          state.timeRemaining = TIME_LIMIT;
+          state.goal = null;
           state.player = {
             position: { x: -8, y: LANES[2] },
             currentLane: 2,
@@ -117,7 +123,7 @@ export const useGameStore = create<GameStore>()(
       set((state) => {
         state.gameState = 'title';
         state.distance = 0;
-        state.timeRemaining = TIME_LIMIT;
+        state.goal = null;
         state.player = {
           position: { x: -8, y: LANES[2] },
           currentLane: 2,
@@ -209,17 +215,33 @@ export const useGameStore = create<GameStore>()(
       });
     },
 
+    updateGoal: (deltaTime: number) => {
+      const { scrollSpeed, distance, goal } = get();
+      
+      set((state) => {
+        // Spawn goal at 80m if not already spawned
+        if (!state.goal && state.distance >= GOAL_SPAWN_DISTANCE) {
+          state.goal = {
+            id: 'goal',
+            position: { x: 15, y: 0 },
+            width: 2,
+            height: 12,
+            reached: false,
+          };
+        }
+        
+        // Move goal if it exists and hasn't been reached
+        if (state.goal && !state.goal.reached) {
+          state.goal.position.x -= scrollSpeed * deltaTime;
+        }
+      });
+    },
+
     updateDistance: (deltaTime: number) => {
       const { scrollSpeed } = get();
       
       set((state) => {
         state.distance += scrollSpeed * deltaTime * 10;
-      });
-    },
-
-    updateTimer: (deltaTime: number) => {
-      set((state) => {
-        state.timeRemaining = Math.max(0, state.timeRemaining - deltaTime * 1000);
       });
     },
 
@@ -284,6 +306,44 @@ export const useGameStore = create<GameStore>()(
           }
         });
       });
+    },
+
+    checkGoalReached: () => {
+      const { player, goal } = get();
+      
+      if (!goal || goal.reached) return false;
+
+      const playerBox = {
+        minX: player.position.x - 0.5,
+        maxX: player.position.x + 0.5,
+        minY: player.position.y - 0.5,
+        maxY: player.position.y + 0.5,
+      };
+
+      const goalBox = {
+        minX: goal.position.x - goal.width / 2,
+        maxX: goal.position.x + goal.width / 2,
+        minY: goal.position.y - goal.height / 2,
+        maxY: goal.position.y + goal.height / 2,
+      };
+
+      // AABB collision check
+      if (
+        playerBox.maxX > goalBox.minX &&
+        playerBox.minX < goalBox.maxX &&
+        playerBox.maxY > goalBox.minY &&
+        playerBox.minY < goalBox.maxY
+      ) {
+        set((state) => {
+          if (state.goal) {
+            state.goal.reached = true;
+          }
+        });
+        get().gameClear();
+        return true;
+      }
+
+      return false;
     },
 
     gameOver: () => {

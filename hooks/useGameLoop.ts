@@ -11,12 +11,12 @@ export function useGameLoop() {
   const updatePlayerPosition = useGameStore((state) => state.updatePlayerPosition);
   const updateObstacles = useGameStore((state) => state.updateObstacles);
   const updateStars = useGameStore((state) => state.updateStars);
+  const updateGoal = useGameStore((state) => state.updateGoal);
   const updateDistance = useGameStore((state) => state.updateDistance);
-  const updateTimer = useGameStore((state) => state.updateTimer);
   const checkCollision = useGameStore((state) => state.checkCollision);
   const checkStarCollection = useGameStore((state) => state.checkStarCollection);
+  const checkGoalReached = useGameStore((state) => state.checkGoalReached);
   const gameOver = useGameStore((state) => state.gameOver);
-  const gameClear = useGameStore((state) => state.gameClear);
 
   const destroySubject = useRef(new Subject<void>());
 
@@ -58,16 +58,13 @@ export function useGameLoop() {
     updatePlayerPosition(delta);
     updateObstacles(delta);
     updateStars(delta);
+    updateGoal(delta);
     updateDistance(delta);
-    updateTimer(delta);
 
     // Check for star collection
     checkStarCollection();
-
-    // Check if time is up
-    const currentTimeRemaining = useGameStore.getState().timeRemaining;
-    if (currentTimeRemaining <= 0) {
-      gameClear();
-    }
+    
+    // Check for goal reached
+    checkGoalReached();
   });
 }
