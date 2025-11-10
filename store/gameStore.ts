@@ -9,11 +9,15 @@ export interface Position {
   y: number;
 }
 
+export type ObstacleType = 'hiragana' | 'katakana' | 'kanji' | 'romaji';
+
 export interface Obstacle {
   id: string;
   position: Position;
   width: number;
   height: number;
+  type: ObstacleType;
+  text: string;
 }
 
 export interface Player {
@@ -61,6 +65,14 @@ const INITIAL_SCROLL_SPEED = 3;
 const TIME_LIMIT = 30000; // 30 seconds in milliseconds
 const INVINCIBLE_DURATION = 5000; // 5 seconds
 const GAME_DISTANCE = 100; // ゴールまでの距離
+
+// Speed multipliers for each obstacle type
+const SPEED_MULTIPLIERS: Record<ObstacleType, number> = {
+  hiragana: 1.0,   // はたーん - standard speed
+  katakana: 1.0,   // ハターン - standard speed
+  kanji: 0.7,      // 破綻 - slower than standard
+  romaji: 1.3,     // hatan - faster than standard
+};
 
 export const useGameStore = create<GameStore>()(
   immer((set, get) => ({
@@ -147,7 +159,8 @@ export const useGameStore = create<GameStore>()(
       set((state) => {
         // Move obstacles
         state.obstacles.forEach((obstacle) => {
-          obstacle.position.x -= scrollSpeed * deltaTime;
+          const speedMultiplier = SPEED_MULTIPLIERS[obstacle.type];
+          obstacle.position.x -= scrollSpeed * deltaTime * speedMultiplier;
         });
 
         // Remove off-screen obstacles
@@ -297,11 +310,22 @@ function generateSingleObstacle(xPosition: number): Obstacle {
   const lane = Math.floor(Math.random() * LANES.length);
   const height = Math.random() * 2 + 1.5;
   
+  // Randomly select one of four hatan patterns
+  const patterns: Array<{ type: ObstacleType; text: string }> = [
+    { type: 'hiragana', text: 'はたーん' },
+    { type: 'katakana', text: 'ハターン' },
+    { type: 'kanji', text: '破綻' },
+    { type: 'romaji', text: 'hatan' },
+  ];
+  const pattern = patterns[Math.floor(Math.random() * patterns.length)];
+  
   return {
     id: `obstacle-${Date.now()}-${Math.random()}`,
     position: { x: xPosition, y: LANES[lane] },
     width: 1,
     height,
+    type: pattern.type,
+    text: pattern.text,
   };
 }
 
