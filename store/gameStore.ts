@@ -27,6 +27,9 @@ export interface Player {
   invincibleTimeRemaining: number;
 }
 
+const INVINCIBLE_DURATION = 5000; // 5 seconds in milliseconds
+const GAME_TIME_LIMIT = 60000; // 60 seconds in milliseconds
+
 export interface Star {
   id: string;
   position: Position;
@@ -49,6 +52,7 @@ interface GameStore {
   goal: Goal | null;
   distance: number;
   scrollSpeed: number;
+  timeRemaining: number;
   
   // Actions
   startGame: () => Result<void, string>;
@@ -60,6 +64,8 @@ interface GameStore {
   updateStars: (deltaTime: number) => void;
   updateGoal: (deltaTime: number) => void;
   updateDistance: (deltaTime: number) => void;
+  updateTimer: (deltaTime: number) => void;
+  updateInvincibility: (deltaTime: number) => void;
   checkCollision: () => boolean;
   checkStarCollection: () => void;
   checkGoalReached: () => boolean;
@@ -96,6 +102,7 @@ export const useGameStore = create<GameStore>()(
     goal: null,
     distance: 0,
     scrollSpeed: INITIAL_SCROLL_SPEED,
+    timeRemaining: GAME_TIME_LIMIT,
 
     startGame: () => {
       try {
@@ -103,6 +110,7 @@ export const useGameStore = create<GameStore>()(
           state.gameState = 'playing';
           state.distance = 0;
           state.goal = null;
+          state.timeRemaining = GAME_TIME_LIMIT;
           state.player = {
             position: { x: -8, y: LANES[2] },
             currentLane: 2,
@@ -124,6 +132,7 @@ export const useGameStore = create<GameStore>()(
         state.gameState = 'title';
         state.distance = 0;
         state.goal = null;
+        state.timeRemaining = GAME_TIME_LIMIT;
         state.player = {
           position: { x: -8, y: LANES[2] },
           currentLane: 2,
@@ -245,8 +254,34 @@ export const useGameStore = create<GameStore>()(
       });
     },
 
+    updateTimer: (deltaTime: number) => {
+      set((state) => {
+        state.timeRemaining = Math.max(0, state.timeRemaining - deltaTime * 1000);
+        if (state.timeRemaining <= 0 && state.gameState === 'playing') {
+          state.gameState = 'gameover';
+        }
+      });
+    },
+
+    updateInvincibility: (deltaTime: number) => {
+      set((state) => {
+        if (state.player.invincible && state.player.invincibleTimeRemaining > 0) {
+          state.player.invincibleTimeRemaining -= deltaTime * 1000;
+          if (state.player.invincibleTimeRemaining <= 0) {
+            state.player.invincible = false;
+            state.player.invincibleTimeRemaining = 0;
+          }
+        }
+      });
+    },
+
     checkCollision: () => {
       const { player, obstacles } = get();
+
+      // Player is invincible, no collision
+      if (player.invincible) {
+        return false;
+      }
 
       const playerBox = {
         minX: player.position.x - 0.5,
@@ -302,6 +337,8 @@ export const useGameStore = create<GameStore>()(
               playerBox.minY < starBox.maxY
             ) {
               star.collected = true;
+              state.player.invincible = true;
+              state.player.invincibleTimeRemaining = INVINCIBLE_DURATION;
             }
           }
         });
