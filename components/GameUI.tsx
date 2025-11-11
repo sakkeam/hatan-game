@@ -1,12 +1,15 @@
 'use client';
 
 import { useGameStore } from '@/store/gameStore';
+import { useFullscreen } from '@/hooks/useFullscreen';
 
 export function GameUI() {
   const gameState = useGameStore((state) => state.gameState);
   const distance = useGameStore((state) => state.distance);
   const timeRemaining = useGameStore((state) => state.timeRemaining);
   const player = useGameStore((state) => state.player);
+  
+  const { isFullscreen, toggleFullscreen, error } = useFullscreen();
 
   if (gameState !== 'playing') {
     return null;
@@ -37,6 +40,19 @@ export function GameUI() {
               }}
             >
               ⭐ {invincibleSeconds}s
+            </div>
+          )}
+          <button
+            onClick={toggleFullscreen}
+            className="pointer-events-auto bg-gray-800 bg-opacity-80 hover:bg-opacity-100 transition-all duration-200 px-3 py-2 rounded-lg text-2xl active:scale-95"
+            title={isFullscreen ? '全画面を解除' : '全画面表示'}
+            aria-label={isFullscreen ? '全画面を解除' : '全画面表示'}
+          >
+            {isFullscreen ? '⛶' : '⛶'}
+          </button>
+          {error && (
+            <div className="bg-red-500 bg-opacity-90 px-3 py-1 rounded text-sm max-w-[200px]">
+              {error}
             </div>
           )}
         </div>
