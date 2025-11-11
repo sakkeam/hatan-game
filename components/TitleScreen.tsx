@@ -37,7 +37,7 @@ export function TitleScreen() {
 
   return (
     <div className="fixed inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-blue-900 to-purple-900 text-white">
-      <div className="mb-8 w-[600px] h-[200px] relative">
+      <div className="mb-8 w-[800px] h-[300px] relative">
         <Image
           src={TITLE_IMAGES[currentLogoIndex]}
           alt="はたんゲーム"
