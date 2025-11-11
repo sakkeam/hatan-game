@@ -48,7 +48,7 @@ export function TitleScreen() {
       </div>
       <div className="max-w-2xl text-center mb-8 px-4">
         <p className="text-2xl mb-4">&quot;やべえ遅刻だ！&quot;</p>
-        <p className="text-lg mb-2">寝坊したキミは、食パンをかじりながら走り出す。</p>
+        <p className="text-lg mb-2">寝坊したキミは、全力で走り出す。</p>
         <p className="text-lg mb-2">道中にある「はたーん」をよけながら、ゴールを目指そう。</p>
         <p className="text-lg mb-2">途中にあるスターをとれば、「はたーん」を吹き飛ばせる。</p>
         <p className="text-lg">&quot;はたーん&quot;を乗り越え、ゴールを目指せ！</p>

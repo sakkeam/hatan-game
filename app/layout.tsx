@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "はたんゲーム",
-  description: "寝坊したキミは食パンをかじりながら走り出す。「はたーん」をよけながらゴールを目指す横スクロールアクションゲーム",
+  description: "寝坊したキミは全力で走り出す。「はたーん」をよけながらゴールを目指す横スクロールアクションゲーム",
 };
 
 export default function RootLayout({
