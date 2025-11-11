@@ -36,8 +36,8 @@ export function TitleScreen() {
   };
 
   return (
-    <div className="fixed inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-blue-900 to-purple-900 text-white">
-      <div className="mb-8 w-[800px] h-[300px] relative">
+    <div className="fixed inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-blue-900 to-purple-900 text-white overflow-y-auto py-4 pb-4 sm:pb-6">
+      <div className="mb-2 sm:mb-4 md:mb-8 landscape:mb-2 w-full max-w-[600px] md:max-w-[800px] h-[120px] sm:h-[200px] md:h-[300px] landscape:h-[100px] relative px-4">
         <Image
           src={TITLE_IMAGES[currentLogoIndex]}
           alt="はたんゲーム"
@@ -46,23 +46,23 @@ export function TitleScreen() {
           priority
         />
       </div>
-      <div className="max-w-2xl text-center mb-8 px-4">
-        <p className="text-2xl mb-4">&quot;やべえ遅刻だ！&quot;</p>
-        <p className="text-lg mb-2">寝坊したキミは、全力で走り出す。</p>
-        <p className="text-lg mb-2">道中にある「はたーん」をよけながら、ゴールを目指そう。</p>
-        <p className="text-lg mb-2">途中にあるスターをとれば、「はたーん」を吹き飛ばせる。</p>
-        <p className="text-lg">&quot;はたーん&quot;を乗り越え、ゴールを目指せ！</p>
+      <div className="max-w-2xl text-center mb-2 sm:mb-4 md:mb-8 landscape:mb-2 px-4">
+        <p className="text-lg sm:text-xl md:text-2xl landscape:text-base mb-2 sm:mb-3 md:mb-4 landscape:mb-1">&quot;やべえ遅刻だ！&quot;</p>
+        <p className="text-sm sm:text-base md:text-lg landscape:text-xs mb-1 sm:mb-2">寝坊したキミは、全力で走り出す。</p>
+        <p className="text-sm sm:text-base md:text-lg landscape:text-xs mb-1 sm:mb-2">道中にある「はたーん」をよけながら、ゴールを目指そう。</p>
+        <p className="text-sm sm:text-base md:text-lg landscape:text-xs mb-1 sm:mb-2">途中にあるスターをとれば、「はたーん」を吹き飛ばせる。</p>
+        <p className="text-sm sm:text-base md:text-lg landscape:text-xs">&quot;はたーん&quot;を乗り越え、ゴールを目指せ！</p>
       </div>
-      <div className="mb-8 text-left bg-black bg-opacity-30 p-6 rounded-lg">
-        <h2 className="text-xl font-bold mb-4">操作方法</h2>
-        <div className="space-y-2">
-          <p>🖱️ PC: ↑↓キー または W/Sキー</p>
-          <p>📱 スマホ: 上下にスワイプ</p>
+      <div className="mb-2 sm:mb-4 md:mb-8 landscape:mb-2 text-left bg-black bg-opacity-30 p-3 sm:p-4 md:p-6 landscape:p-2 rounded-lg">
+        <h2 className="text-base sm:text-lg md:text-xl landscape:text-sm font-bold mb-2 sm:mb-3 md:mb-4 landscape:mb-1">操作方法</h2>
+        <div className="space-y-1 sm:space-y-2 landscape:space-y-1">
+          <p className="text-sm sm:text-base md:text-lg landscape:text-xs">🖱️ PC: ↑↓キー または W/Sキー</p>
+          <p className="text-sm sm:text-base md:text-lg landscape:text-xs">📱 スマホ: 上下にスワイプ</p>
         </div>
       </div>
       <button
         onClick={handleStart}
-        className="px-8 py-4 text-2xl font-bold bg-yellow-500 hover:bg-yellow-600 text-black rounded-lg transition-colors shadow-lg"
+        className="px-6 py-3 md:px-8 md:py-4 landscape:px-5 landscape:py-2 text-xl md:text-2xl landscape:text-lg font-bold bg-yellow-500 hover:bg-yellow-600 text-black rounded-lg transition-colors shadow-lg"
       >
         ゲームスタート
       </button>
