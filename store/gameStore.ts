@@ -53,6 +53,7 @@ interface GameStore {
   distance: number;
   scrollSpeed: number;
   timeRemaining: number;
+  isFullscreen: boolean;
   
   // Actions
   startGame: () => Result<void, string>;
@@ -72,6 +73,7 @@ interface GameStore {
   gameOver: () => void;
   gameClear: () => void;
   updateObstacleDimensions: (id: string, width: number, height: number) => void;
+  setFullscreen: (value: boolean) => void;
 }
 
 const LANES = [-4.8, -2.4, 0, 2.4, 4.8]; // Y coordinates for 5 lanes (matching background sections)
@@ -103,6 +105,7 @@ export const useGameStore = create<GameStore>()(
     distance: 0,
     scrollSpeed: INITIAL_SCROLL_SPEED,
     timeRemaining: GAME_TIME_LIMIT,
+    isFullscreen: false,
 
     startGame: () => {
       try {
@@ -404,6 +407,12 @@ export const useGameStore = create<GameStore>()(
           obstacle.width = width;
           obstacle.height = height;
         }
+      });
+    },
+
+    setFullscreen: (value: boolean) => {
+      set((state) => {
+        state.isFullscreen = value;
       });
     },
   }))
