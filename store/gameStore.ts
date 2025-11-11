@@ -415,7 +415,7 @@ export const useGameStore = create<GameStore>()(
         state.isFullscreen = value;
       });
     },
-  })
+  }))
 );
 
 // Helper functions
