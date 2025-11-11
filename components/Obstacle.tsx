@@ -25,7 +25,7 @@ export function Obstacle({ obstacle }: ObstacleProps) {
 
   // Select texture based on obstacle pattern
   const currentTexture = useMemo(() => {
-    switch (obstacle.obstaclePattern) {
+    switch (obstacle.type) {
       case 'hiragana':
         return textures.hiragana;
       case 'katakana':
@@ -37,7 +37,7 @@ export function Obstacle({ obstacle }: ObstacleProps) {
       default:
         return textures.hiragana;
     }
-  }, [obstacle.obstaclePattern, textures]);
+  }, [obstacle.type, textures]);
 
   // Set fixed dimensions on mount
   useEffect(() => {
