@@ -53,7 +53,7 @@ export function TitleScreen() {
         <p className="text-sm sm:text-base md:text-lg landscape:text-xs mb-1 sm:mb-2">途中にあるスターをとれば、「はたーん」を吹き飛ばせる。</p>
         <p className="text-sm sm:text-base md:text-lg landscape:text-xs">&quot;はたーん&quot;を乗り越え、ゴールを目指せ！</p>
       </div>
-      <div className="mb-2 sm:mb-4 md:mb-8 landscape:mb-2 text-left bg-black bg-opacity-30 p-3 sm:p-4 md:p-6 landscape:p-2 rounded-lg"> bg-opacity-30 p-3 sm:p-4 md:p-6 landscape:p-2 rounded-lg">
+      <div className="mb-2 sm:mb-4 md:mb-8 landscape:mb-2 text-left bg-black bg-opacity-30 p-3 sm:p-4 md:p-6 landscape:p-2 rounded-lg">
         <h2 className="text-base sm:text-lg md:text-xl landscape:text-sm font-bold mb-2 sm:mb-3 md:mb-4 landscape:mb-1">操作方法</h2>
         <div className="space-y-1 sm:space-y-2 landscape:space-y-1">
           <p className="text-sm sm:text-base md:text-lg landscape:text-xs">🖱️ PC: ↑↓キー または W/Sキー</p>
