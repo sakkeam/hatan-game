@@ -42,8 +42,8 @@ export function Obstacle({ obstacle }: ObstacleProps) {
   // Set fixed dimensions on mount
   useEffect(() => {
     // Fixed dimensions based on image size
-    const width = 2.4;
-    const height = 1.8;
+    const width = 3.2;
+    const height = 2.4;
     updateObstacleDimensions(obstacle.id, width, height);
   }, [obstacle.id, updateObstacleDimensions]);
 
@@ -56,7 +56,7 @@ export function Obstacle({ obstacle }: ObstacleProps) {
 
   return (
     <group ref={groupRef}>
-      <sprite ref={spriteRef} scale={[2.4, 1.8, 1]}>
+      <sprite ref={spriteRef} scale={[3.2, 2.4, 1]}>
         <spriteMaterial map={currentTexture} transparent={true} />
       </sprite>
     </group>
