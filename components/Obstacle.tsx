@@ -41,9 +41,9 @@ export function Obstacle({ obstacle }: ObstacleProps) {
 
   // Set fixed dimensions on mount
   useEffect(() => {
-    // Fixed dimensions based on image size
+    // Fixed dimensions based on lane width (2.4)
     const width = 6.0;
-    const height = 4.5;
+    const height = 2.4;
     updateObstacleDimensions(obstacle.id, width, height);
   }, [obstacle.id, updateObstacleDimensions]);
 
