@@ -32,6 +32,7 @@ export function Player() {
     if (meshRef.current) {
       meshRef.current.position.x = player.position.x;
       meshRef.current.position.y = player.position.y;
+      meshRef.current.position.z = 1; // Place player in front of obstacles
       meshRef.current.lookAt(camera.position);
 
       // 10fps animation (0.1 seconds per frame)

@@ -1,9 +1,9 @@
 'use client';
 
-import { useRef, useCallback } from 'react';
+import { useRef, useEffect, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Text } from '@react-three/drei';
-import { Group } from 'three';
+import { useTexture } from '@react-three/drei';
+import { Group, Sprite } from 'three';
 import { Obstacle as ObstacleType, useGameStore } from '@/store/gameStore';
 
 interface ObstacleProps {
@@ -12,7 +12,40 @@ interface ObstacleProps {
 
 export function Obstacle({ obstacle }: ObstacleProps) {
   const groupRef = useRef<Group>(null);
+  const spriteRef = useRef<Sprite>(null);
   const updateObstacleDimensions = useGameStore((state) => state.updateObstacleDimensions);
+
+  // Preload all hatan textures
+  const textures = useTexture({
+    hiragana: '/assets/images/hatan_hiragana.png',
+    katakana: '/assets/images/hatan_katakaba.png',
+    kanji: '/assets/images/hatan_kanji.png',
+    romaji: '/assets/images/hatan_English.png',
+  });
+
+  // Select texture based on obstacle pattern
+  const currentTexture = useMemo(() => {
+    switch (obstacle.type) {
+      case 'hiragana':
+        return textures.hiragana;
+      case 'katakana':
+        return textures.katakana;
+      case 'kanji':
+        return textures.kanji;
+      case 'romaji':
+        return textures.romaji;
+      default:
+        return textures.hiragana;
+    }
+  }, [obstacle.type, textures]);
+
+  // Set fixed dimensions on mount
+  useEffect(() => {
+    // Fixed dimensions based on lane width (2.4)
+    const width = 6.0;
+    const height = 2.4;
+    updateObstacleDimensions(obstacle.id, width, height);
+  }, [obstacle.id, updateObstacleDimensions]);
 
   useFrame(() => {
     if (groupRef.current) {
@@ -21,27 +54,11 @@ export function Obstacle({ obstacle }: ObstacleProps) {
     }
   });
 
-  const handleSync = useCallback((troika: any) => {
-    if (troika.geometry?.boundingBox) {
-      const bounds = troika.geometry.boundingBox;
-      const width = bounds.max.x - bounds.min.x;
-      const height = bounds.max.y - bounds.min.y;
-      updateObstacleDimensions(obstacle.id, width, height);
-    }
-  }, [obstacle.id, updateObstacleDimensions]);
-
   return (
     <group ref={groupRef}>
-      <Text
-        font="/fonts/Noto_Sans_JP/NotoSansJP-VariableFont_wght.ttf"
-        fontSize={1.2}
-        color="#4a5568"
-        anchorX="center"
-        anchorY="middle"
-        onSync={handleSync}
-      >
-        {obstacle.text}
-      </Text>
+      <sprite ref={spriteRef} scale={[6.0, 4.5, 1]}>
+        <spriteMaterial map={currentTexture} transparent={true} />
+      </sprite>
     </group>
   );
 }
