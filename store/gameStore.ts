@@ -438,7 +438,7 @@ function generateSingleObstacle(xPosition: number, existingObstacles: Obstacle[]
   // If 3 or more lanes are occupied at this X position, find available lanes
   if (occupiedLanes.size >= 3) {
     const availableLanes = Array.from(
-      { length: LANES.length },
+      { length: LANES.length - 1 },
       (_, i) => i
     ).filter((i) => !occupiedLanes.has(i));
     
@@ -471,7 +471,7 @@ function generateSingleObstacle(xPosition: number, existingObstacles: Obstacle[]
   }
   
   // Less than 3 obstacles at this position, proceed normally
-  const lane = Math.floor(Math.random() * LANES.length);
+  const lane = Math.floor(Math.random() * (LANES.length - 1));
   
   // Randomly select one of four hatan patterns
   const patterns: Array<{ type: ObstacleType; text: string }> = [
@@ -501,7 +501,7 @@ function generateStars(): Star[] {
 }
 
 function generateSingleStar(xPosition: number): Star {
-  const lane = Math.floor(Math.random() * LANES.length);
+  const lane = Math.floor(Math.random() * (LANES.length - 1));
   
   return {
     id: `star-${Date.now()}-${Math.random()}`,
