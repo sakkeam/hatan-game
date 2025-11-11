@@ -1,10 +1,31 @@
 'use client';
 
 import { useGameStore } from '@/store/gameStore';
+import Image from 'next/image';
+import { useState, useEffect } from 'react';
+
+const TITLE_IMAGES = [
+  '/assets/images/title1_red.png',
+  '/assets/images/title2_daidai.png',
+  '/assets/images/title3_yellow.png',
+  '/assets/images/title4_green.png',
+  '/assets/images/title5_lightblue.png',
+  '/assets/images/title6_blue.png',
+  '/assets/images/title7_purple.png',
+];
 
 export function TitleScreen() {
   const gameState = useGameStore((state) => state.gameState);
   const startGame = useGameStore((state) => state.startGame);
+  const [currentLogoIndex, setCurrentLogoIndex] = useState(0);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setCurrentLogoIndex((prev) => (prev + 1) % TITLE_IMAGES.length);
+    }, 800);
+
+    return () => clearInterval(intervalId);
+  }, []);
 
   if (gameState !== 'title') {
     return null;
@@ -16,7 +37,15 @@ export function TitleScreen() {
 
   return (
     <div className="fixed inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-blue-900 to-purple-900 text-white">
-      <h1 className="text-6xl font-bold mb-8 animate-pulse">はたんゲーム</h1>
+      <div className="mb-8 w-[800px] h-[300px] relative">
+        <Image
+          src={TITLE_IMAGES[currentLogoIndex]}
+          alt="はたんゲーム"
+          fill
+          className="object-contain transition-opacity duration-300"
+          priority
+        />
+      </div>
       <div className="max-w-2xl text-center mb-8 px-4">
         <p className="text-2xl mb-4">&quot;やべえ遅刻だ！&quot;</p>
         <p className="text-lg mb-2">寝坊したキミは、食パンをかじりながら走り出す。</p>
