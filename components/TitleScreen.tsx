@@ -1,6 +1,7 @@
 'use client';
 
 import { useGameStore } from '@/store/gameStore';
+import { useFullscreen } from '@/hooks/useFullscreen';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 
@@ -18,6 +19,8 @@ export function TitleScreen() {
   const gameState = useGameStore((state) => state.gameState);
   const startGame = useGameStore((state) => state.startGame);
   const [currentLogoIndex, setCurrentLogoIndex] = useState(0);
+  
+  const { isFullscreen, toggleFullscreen, error } = useFullscreen();
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -37,6 +40,19 @@ export function TitleScreen() {
 
   return (
     <div className="fixed inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-blue-900 to-purple-900 text-white overflow-y-auto py-4 pb-4 sm:pb-6">
+      <button
+        onClick={toggleFullscreen}
+        className="absolute top-4 right-4 bg-gray-800 bg-opacity-80 hover:bg-opacity-100 transition-all duration-200 px-3 py-2 rounded-lg text-2xl active:scale-95 z-10"
+        title={isFullscreen ? '全画面を解除' : '全画面表示'}
+        aria-label={isFullscreen ? '全画面を解除' : '全画面表示'}
+      >
+        {isFullscreen ? '⛶' : '⛶'}
+      </button>
+      {error && (
+        <div className="absolute top-20 right-4 bg-red-500 bg-opacity-90 px-3 py-2 rounded text-sm max-w-[250px] z-10">
+          {error}
+        </div>
+      )}
       <div className="mb-2 sm:mb-4 md:mb-8 landscape:mb-2 w-full max-w-[600px] md:max-w-[800px] h-[120px] sm:h-[200px] md:h-[300px] landscape:h-[100px] relative px-4">
         <Image
           src={TITLE_IMAGES[currentLogoIndex]}
